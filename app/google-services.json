@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "450538159550",
+    "project_id": "investwiseindia-68c89",
+    "storage_bucket": "investwiseindia-68c89.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:450538159550:android:d1b485b6d11dce70344def",
+        "android_client_info": {
+          "package_name": "com.investwise_india"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "450538159550-q3bnm52i3tkbl8g1346ub0ui12ui73n9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.investwise_india",
+            "certificate_hash": "8fa261ef9706ee555ea3d154126ceb4b4fb281cb"
+          }
+        },
+        {
+          "client_id": "450538159550-4dkn6i717peq5vo5h559kjqnicbhvk49.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCUczW6LNgK53jsTta7h7k9NZuvsBW3URY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "450538159550-4dkn6i717peq5vo5h559kjqnicbhvk49.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
