@@ -12,6 +12,7 @@ import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.auth.UserProfileChangeRequest
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -47,7 +48,20 @@ class AuthViewModel : ViewModel() {
                 _authState.value = AuthState.Loading
                 
                 val credential = GoogleAuthProvider.getCredential(account.idToken, null)
-                auth.signInWithCredential(credential).await()
+                val result = auth.signInWithCredential(credential).await()
+                
+                // Update the user's display name if it's not set
+                if (result.user?.displayName.isNullOrBlank() && !account.displayName.isNullOrBlank()) {
+                    val profileUpdates = UserProfileChangeRequest.Builder()
+                        .setDisplayName(account.displayName)
+                        .build()
+                    
+                    result.user?.updateProfile(profileUpdates)?.await()
+                    
+                    // Force refresh the current user to get updated profile
+                    result.user?.reload()?.await()
+                    _currentUser.value = auth.currentUser
+                }
                 
                 _authState.value = AuthState.Success
             } catch (e: Exception) {
@@ -83,17 +97,58 @@ class AuthViewModel : ViewModel() {
         }
     }
     
-    fun createAccountWithEmailPassword(email: String, password: String) {
+    fun createAccountWithEmailPassword(email: String, password: String, displayName: String = "") {
         viewModelScope.launch {
             try {
                 _authState.value = AuthState.Loading
                 
-                auth.createUserWithEmailAndPassword(email, password).await()
+                val result = auth.createUserWithEmailAndPassword(email, password).await()
+                
+                // Set display name if provided
+                if (displayName.isNotBlank()) {
+                    val profileUpdates = UserProfileChangeRequest.Builder()
+                        .setDisplayName(displayName)
+                        .build()
+                    
+                    result.user?.updateProfile(profileUpdates)?.await()
+                    
+                    // Force refresh the current user to get updated profile
+                    auth.currentUser?.reload()?.await()
+                    _currentUser.value = auth.currentUser
+                }
                 
                 _authState.value = AuthState.Success
             } catch (e: Exception) {
                 Log.e("AuthViewModel", "Account creation failed", e)
                 _authState.value = AuthState.Error(e.message ?: "Account creation failed")
+            }
+        }
+    }
+    
+    fun updateUserDisplayName(displayName: String) {
+        viewModelScope.launch {
+            try {
+                _authState.value = AuthState.Loading
+                
+                val user = auth.currentUser
+                if (user != null) {
+                    val profileUpdates = UserProfileChangeRequest.Builder()
+                        .setDisplayName(displayName)
+                        .build()
+                    
+                    user.updateProfile(profileUpdates).await()
+                    
+                    // Force refresh the current user to get updated profile
+                    user.reload().await()
+                    _currentUser.value = auth.currentUser
+                    
+                    _authState.value = AuthState.Success
+                } else {
+                    _authState.value = AuthState.Error("No user is signed in")
+                }
+            } catch (e: Exception) {
+                Log.e("AuthViewModel", "Profile update failed", e)
+                _authState.value = AuthState.Error(e.message ?: "Profile update failed")
             }
         }
     }

@@ -14,6 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.investwise_india.model.MutualFund
 import com.investwise_india.network.MutualFundApiService
 import com.investwise_india.network.MutualFundDetails
@@ -25,6 +26,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.async
+import kotlinx.coroutines.CoroutineScope
+import com.investwise_india.ui.components.SelectFundDialog
+import com.investwise_india.ui.viewmodel.CompareViewModel
+import com.investwise_india.ui.viewmodel.ViewModelFactory
+import com.investwise_india.data.DataModule
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,53 +41,40 @@ fun CompareScreen(
     selectedFunds: List<MutualFund> = emptyList(),
     onRemoveFund: (MutualFund) -> Unit = {}
 ) {
-    var isLoading by remember { mutableStateOf(false) }
-    var error by remember { mutableStateOf<String?>(null) }
-    var fundDetails by remember { mutableStateOf<Map<Int, MutualFundDetails>>(emptyMap()) }
+    // Create a coroutine scope that follows the Compose lifecycle
     val coroutineScope = rememberCoroutineScope()
-
-    LaunchedEffect(selectedFunds) {
-        if (selectedFunds.isNotEmpty()) {
-            isLoading = true
-            error = null
-            fundDetails = emptyMap() // Reset details when funds change
-            
-            withContext(Dispatchers.IO) {
-                try {
-                    // Create a map to store the results
-                    val newDetails = mutableMapOf<Int, MutualFundDetails>()
-                    
-                    // Launch parallel requests for each fund
-                    val deferredResults = selectedFunds.map { fund ->
-                        async {
-                            val response = apiService.getMutualFundDetails(fund.schemeCode)
-                            if (response.isSuccessful && response.body() != null) {
-                                fund.schemeCode to response.body()!!
-                            } else {
-                                null
-                            }
-                        }
-                    }
-                    
-                    // Wait for all requests to complete
-                    deferredResults.forEach { deferred ->
-                        deferred.await()?.let { (schemeCode, details) ->
-                            newDetails[schemeCode] = details
-                        }
-                    }
-                    
-                    // Update the UI on the main thread
-                    withContext(Dispatchers.Main) {
-                        fundDetails = newDetails
-                        isLoading = false
-                    }
-                } catch (e: Exception) {
-                    withContext(Dispatchers.Main) {
-                        error = e.message ?: "Failed to load fund details"
-                        isLoading = false
-                    }
-                }
+    
+    // Create the ViewModel using the factory with a fixed key to ensure it's retained
+    val viewModel: CompareViewModel = viewModel(
+        factory = ViewModelFactory(apiService),
+        key = "CompareViewModel" // Fixed key to ensure the ViewModel is retained
+    )
+    
+    // Collect state from the ViewModel
+    val funds by viewModel.selectedFunds.collectAsState()
+    val fundDetails by viewModel.fundDetails.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+    val error by viewModel.error.collectAsState()
+    val showSelectFundDialog by viewModel.showSelectFundDialog.collectAsState()
+    
+    // Initialize the ViewModel with the selected funds if provided
+    // Use DisposableEffect to handle lifecycle properly
+    DisposableEffect(Unit) {
+        if (selectedFunds.isNotEmpty() && funds.isEmpty()) {
+            coroutineScope.launch {
+                selectedFunds.forEach { viewModel.addFund(it) }
             }
+        }
+        onDispose { }
+    }
+    
+    // Ensure mutual fund data is loaded
+    val repository = DataModule.mutualFundRepository
+    val dataLoaded by repository.dataLoaded.collectAsState(initial = false)
+    
+    LaunchedEffect(Unit) {
+        if (!dataLoaded) {
+            repository.loadAllMutualFunds()
         }
     }
 
@@ -104,8 +97,8 @@ fun CompareScreen(
                 },
                 actions = {
                     IconButton(
-                        onClick = onAddFund,
-                        enabled = selectedFunds.size < 3
+                        onClick = { viewModel.showSelectFundDialog() },
+                        enabled = funds.size < 3
                     ) {
                         Icon(
                             imageVector = Icons.Default.Add,
@@ -136,7 +129,7 @@ fun CompareScreen(
                             .padding(16.dp)
                     )
                 }
-                selectedFunds.isEmpty() -> {
+                funds.isEmpty() -> {
                     Column(
                         modifier = Modifier
                             .align(Alignment.Center)
@@ -149,7 +142,7 @@ fun CompareScreen(
                             textAlign = TextAlign.Center
                         )
                         Spacer(modifier = Modifier.height(8.dp))
-                        Button(onClick = onAddFund) {
+                        Button(onClick = { viewModel.showSelectFundDialog() }) {
                             Text("Add Fund")
                         }
                     }
@@ -161,18 +154,34 @@ fun CompareScreen(
                             .padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        items(selectedFunds) { fund ->
+                        items(funds) { fund ->
                             val details = fundDetails[fund.schemeCode]
                             ComparisonCard(
                                 fund = fund,
                                 details = details,
-                                onRemove = { onRemoveFund(fund) }
+                                onRemove = { 
+                                    viewModel.removeFund(fund)
+                                    onRemoveFund(fund) // Also notify parent
+                                }
                             )
                         }
                     }
                 }
             }
         }
+    }
+    
+    // Show the select fund dialog if needed
+    if (showSelectFundDialog) {
+        SelectFundDialog(
+            apiService = apiService,
+            onDismiss = { viewModel.hideSelectFundDialog() },
+            onFundSelected = { fund ->
+                viewModel.addFund(fund)
+                viewModel.hideSelectFundDialog() // Explicitly hide dialog after selection
+                onAddFund() // Notify parent
+            }
+        )
     }
 }
 
@@ -246,6 +255,71 @@ private fun ComparisonCard(
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                     )
                 }
+                
+                // Display fund ratios
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = "Fund Ratios",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                // First row of ratios
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    RatioItem(
+                        label = "Expense Ratio",
+                        value = details.meta.expense_ratio?.let { "${it}%" } ?: "N/A",
+                        modifier = Modifier.weight(1f)
+                    )
+                    RatioItem(
+                        label = "Sharpe Ratio",
+                        value = details.meta.sharpe_ratio?.toString() ?: "N/A",
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                // Second row of ratios
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    RatioItem(
+                        label = "Alpha",
+                        value = details.meta.alpha?.toString() ?: "N/A",
+                        modifier = Modifier.weight(1f)
+                    )
+                    RatioItem(
+                        label = "Beta",
+                        value = details.meta.beta?.toString() ?: "N/A",
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                // Third row of ratios
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    RatioItem(
+                        label = "P/E Ratio",
+                        value = details.meta.pe_ratio?.toString() ?: "N/A",
+                        modifier = Modifier.weight(1f)
+                    )
+                    RatioItem(
+                        label = "P/B Ratio",
+                        value = details.meta.pb_ratio?.toString() ?: "N/A",
+                        modifier = Modifier.weight(1f)
+                    )
+                }
             } else {
                 Spacer(modifier = Modifier.height(8.dp))
                 CircularProgressIndicator(
@@ -256,6 +330,32 @@ private fun ComparisonCard(
                 )
             }
         }
+    }
+}
+
+/**
+ * Composable to display a single ratio item with label and value
+ */
+@Composable
+private fun RatioItem(
+    label: String,
+    value: String,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier.padding(horizontal = 4.dp),
+        horizontalAlignment = Alignment.Start
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.SemiBold
+        )
     }
 }
 

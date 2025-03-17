@@ -70,8 +70,14 @@ fun AuthScreen(
         AccountScreen(
             user = currentUser,
             onSignInClick = {
-                val signInIntent = googleSignInClient.signInIntent
-                googleSignInLauncher.launch(signInIntent)
+                // Sign out first to ensure account picker is shown
+                googleSignInClient.signOut().addOnCompleteListener {
+                    // Configure sign-in to request the user's ID, email address, and basic profile
+                    val signInIntent = googleSignInClient.signInIntent
+                    // Always force showing the account picker
+                    signInIntent.putExtra("prompt", "select_account")
+                    googleSignInLauncher.launch(signInIntent)
+                }
             },
             onSignOutClick = {
                 viewModel.signOut()
@@ -84,6 +90,12 @@ fun AuthScreen(
                 } else {
                     viewModel.signInWithEmailPassword(email, password)
                 }
+            },
+            onEmailSignUpClick = { email, password, displayName ->
+                viewModel.createAccountWithEmailPassword(email, password, displayName)
+            },
+            onUpdateProfile = { displayName ->
+                viewModel.updateUserDisplayName(displayName)
             }
         )
     }

@@ -17,6 +17,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.FlowPreview
+import com.investwise_india.data.DataModule
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.Job
 
 @OptIn(ExperimentalMaterial3Api::class, FlowPreview::class)
 @Composable
@@ -26,57 +29,66 @@ fun SelectFundDialog(
     onFundSelected: (MutualFund) -> Unit
 ) {
     var searchQuery by remember { mutableStateOf("") }
-    var funds by remember { mutableStateOf<List<MutualFund>>(emptyList()) }
     var filteredFunds by remember { mutableStateOf<List<MutualFund>>(emptyList()) }
-    var isLoading by remember { mutableStateOf(true) }
-    var error by remember { mutableStateOf<String?>(null) }
+    
+    // Create a coroutine scope that follows the Compose lifecycle
+    val coroutineScope = rememberCoroutineScope()
+    
+    // Get repository instance
+    val repository = DataModule.mutualFundRepository
+    
+    // Collect states from repository
+    val funds by repository.allMutualFunds.collectAsState(initial = emptyList())
+    val isLoading by repository.isLoading.collectAsState(initial = true)
+    val error by repository.error.collectAsState(initial = null)
+    val dataLoaded by repository.dataLoaded.collectAsState(initial = false)
     
     // Create a StateFlow for search query to debounce user input
     val searchFlow = remember { MutableStateFlow("") }
 
-    // Load funds on initialization
-    LaunchedEffect(Unit) {
-        withContext(Dispatchers.IO) {
-            try {
-                val response = apiService.getAllMutualFunds()
-                withContext(Dispatchers.Main) {
-                    if (response.isSuccessful && response.body() != null) {
-                        funds = response.body()!!
-                        filteredFunds = funds
-                    } else {
-                        error = "Failed to load mutual funds"
-                    }
-                    isLoading = false
-                }
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    error = e.message ?: "An error occurred"
-                    isLoading = false
-                }
+    // Load funds if not already loaded
+    DisposableEffect(Unit) {
+        var job: Job? = null
+        if (!dataLoaded && funds.isEmpty()) {
+            job = coroutineScope.launch {
+                repository.loadAllMutualFunds()
             }
+        }
+        onDispose {
+            job?.cancel()
         }
     }
 
+    // Initialize filtered funds when funds are loaded
+    LaunchedEffect(funds) {
+        filteredFunds = funds
+    }
+
     // Handle search query changes on background thread
-    LaunchedEffect(searchQuery) {
+    DisposableEffect(searchQuery) {
         searchFlow.value = searchQuery
-        searchFlow
-            .debounce(300) // Add debounce to prevent excessive filtering
-            .distinctUntilChanged()
-            .collect { query ->
-                withContext(Dispatchers.Default) {
-                    val filtered = if (query.isEmpty()) {
-                        funds
-                    } else {
-                        funds.filter {
-                            it.schemeName.contains(query, ignoreCase = true)
+        val job = coroutineScope.launch {
+            searchFlow
+                .debounce(300) // Add debounce to prevent excessive filtering
+                .distinctUntilChanged()
+                .collect { query ->
+                    withContext(Dispatchers.Default) {
+                        val filtered = if (query.isEmpty()) {
+                            funds
+                        } else {
+                            funds.filter {
+                                it.schemeName.contains(query, ignoreCase = true)
+                            }
+                        }
+                        withContext(Dispatchers.Main) {
+                            filteredFunds = filtered
                         }
                     }
-                    withContext(Dispatchers.Main) {
-                        filteredFunds = filtered
-                    }
                 }
-            }
+        }
+        onDispose {
+            job.cancel()
+        }
     }
 
     AlertDialog(

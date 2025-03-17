@@ -33,6 +33,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import retrofit2.Response
+import com.investwise_india.util.RatioCalculator
+import com.investwise_india.data.repository.MutualFundRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import androidx.compose.runtime.remember
+
+// The MutualFundRepository is used for consistent ratio calculations
+private lateinit var mutualFundRepository: MutualFundRepository
 
 @Composable
 fun MutualFundListScreen(
@@ -40,6 +48,11 @@ fun MutualFundListScreen(
     apiService: MutualFundApiService,
     onBackPressed: () -> Unit
 ) {
+    // Initialize the repository if it hasn't been already
+    if (!::mutualFundRepository.isInitialized) {
+        mutualFundRepository = MutualFundRepository(apiService)
+    }
+    
     var mutualFunds by remember { mutableStateOf<List<MutualFund>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
     var error by remember { mutableStateOf<String?>(null) }
@@ -47,16 +60,16 @@ fun MutualFundListScreen(
     // Define scheme codes for each category
     val categorySchemes = remember(category) {
         when (category.id) {
-            1 -> listOf(100171, 119598, 120465, 125497, 118533) // Large Cap
-            2 -> listOf(118834, 118566, 120822, 125494, 118528) // Mid Cap
-            3 -> listOf(118701, 120684, 125496, 118532, 118568) // Small Cap
-            4 -> listOf(118533, 118837, 120686, 125498, 118570) // Hybrid
-            5 -> listOf(118535, 118839, 120688, 125499, 118572) // Debt
-            6 -> listOf(118537, 118841, 120690, 125500, 118574) // ELSS
-            7 -> listOf(118539, 118843, 120692, 125501, 118576) // Flexicap
-            8 -> listOf(118541, 118845, 120694, 125502, 118578) // Thematic
-            9 -> listOf(118543, 118847, 120696, 125503, 118580) // Index
-            10 -> listOf(118545, 118849, 120698, 125504, 118582) // International
+            1 -> listOf(118632, 120586, 119598, 119250) // Large Cap
+            2 -> listOf(127042, 118989, 118668, 125307, 119775, 120841) // Mid Cap
+            3 -> listOf(147946, 118778, 120828, 148618, 125354, 130503) // Small Cap
+            4 -> listOf(120484, 120251, 118624, 120674, 143537, 120819, 119019) // Hybrid
+            5 -> listOf(118535, 118839, 120688, 125499, 118572) // Debt (Not Updated)
+            6 -> listOf(120847, 120270, 119723, 133386, 119242) // ELSS
+            7 -> listOf(120843, 122639, 118955, 129046, 120492) // Flexicap
+            8 -> listOf(120700, 148747, 152064) // Thematic
+            9 -> listOf(147622, 148555, 148807, 148726, 149892, 149389) // Index
+            10 -> listOf(118545, 118849, 120698, 125504, 118582) // International (Not updated)
             else -> emptyList()
         }
     }
@@ -230,14 +243,36 @@ fun MutualFundItem(
     var isLoadingDetails by remember { mutableStateOf(false) }
     var detailsError by remember { mutableStateOf<String?>(null) }
     
+    // Create a coroutine scope that follows the Compose lifecycle
+    val coroutineScope = rememberCoroutineScope()
+    
+    // Initialize the repository if it hasn't been already
+    if (!::mutualFundRepository.isInitialized) {
+        mutualFundRepository = MutualFundRepository(apiService)
+    }
+    
     LaunchedEffect(showDetails) {
         if (showDetails && fundDetails == null && !isLoadingDetails) {
             isLoadingDetails = true
             detailsError = null
             try {
-                val response = apiService.getMutualFundDetails(fund.schemeCode)
-                if (response.isSuccessful && response.body() != null) {
-                    fundDetails = response.body()
+                // Use the repository to get fund details with consistent ratios
+                val details = mutualFundRepository.getMutualFundDetails(fund.schemeCode)
+                if (details != null) {
+                    fundDetails = details
+                    
+                    // Set up a check to see if real ratios are calculated after a delay
+                    coroutineScope.launch {
+                        kotlinx.coroutines.delay(3000)
+                        
+                        // Check for updated ratios
+                        val updatedDetails = mutualFundRepository.getLatestFundDetails(fund.schemeCode)
+                        if (updatedDetails != null) {
+                            withContext(Dispatchers.Main) {
+                                fundDetails = updatedDetails
+                            }
+                        }
+                    }
                 } else {
                     detailsError = "Failed to load fund details"
                 }
@@ -347,33 +382,92 @@ fun MutualFundItem(
                     
                     // Show latest NAV if available
                     if (!fundDetails?.data.isNullOrEmpty()) {
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text(
-                            text = "Latest NAV Information",
-                            style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onBackground
-                        )
-                        
                         Spacer(modifier = Modifier.height(8.dp))
                         
-                        val latestNav = fundDetails?.data?.firstOrNull()
-                        if (latestNav != null) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                InfoColumn(
-                                    label = "Date",
-                                    value = latestNav.date
-                                )
-                                
-                                InfoColumn(
-                                    label = "NAV",
-                                    value = "₹${latestNav.nav}"
-                                )
-                            }
-                        }
+                        InfoColumn(
+                            label = "Latest NAV",
+                            value = "₹${fundDetails?.data?.firstOrNull()?.nav ?: "N/A"}"
+                        )
+                        
+                        InfoColumn(
+                            label = "As of",
+                            value = fundDetails?.data?.firstOrNull()?.date ?: "N/A"
+                        )
+                    }
+                    
+                    // Display fund ratios section
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = "Fund Ratios",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+                    
+                    Spacer(modifier = Modifier.height(8.dp))
+                    
+                    // First row of ratios
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        InfoColumn(
+                            label = "Expense Ratio",
+                            value = fundDetails?.meta?.expense_ratio?.let { "${it}%" } ?: "N/A",
+                            modifier = Modifier.weight(1f)
+                        )
+                        
+                        InfoColumn(
+                            label = "Sharpe Ratio",
+                            value = fundDetails?.meta?.sharpe_ratio?.toString() ?: "N/A",
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                    
+                    Spacer(modifier = Modifier.height(8.dp))
+                    
+                    // Second row of ratios
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        InfoColumn(
+                            label = "Alpha",
+                            value = fundDetails?.meta?.alpha?.toString() ?: "N/A",
+                            modifier = Modifier.weight(1f)
+                        )
+                        
+                        InfoColumn(
+                            label = "Beta",
+                            value = fundDetails?.meta?.beta?.toString() ?: "N/A",
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                    
+                    Spacer(modifier = Modifier.height(8.dp))
+                    
+                    // Third row of ratios
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        InfoColumn(
+                            label = "P/E Ratio",
+                            value = fundDetails?.meta?.pe_ratio?.toString() ?: "N/A",
+                            modifier = Modifier.weight(1f)
+                        )
+                        
+                        InfoColumn(
+                            label = "P/B Ratio",
+                            value = fundDetails?.meta?.pb_ratio?.toString() ?: "N/A",
+                            modifier = Modifier.weight(1f)
+                        )
                     }
                 }
                 
