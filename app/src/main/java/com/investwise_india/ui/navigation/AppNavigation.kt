@@ -2,8 +2,11 @@ package com.investwise_india.ui.navigation
 
 import androidx.compose.runtime.*
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
+//import androidx.navigation.navType.navArgument
 import com.investwise_india.network.MutualFundApiService
 import com.investwise_india.ui.screens.*
 import com.investwise_india.model.MutualFund
@@ -12,6 +15,7 @@ import com.investwise_india.model.InvestmentOption
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.investwise_india.auth.AuthScreen
+import com.investwise_india.model.DebtFundSubcategories
 import com.investwise_india.ui.components.SelectFundDialog
 
 // Define navigation routes
@@ -25,8 +29,14 @@ sealed class Screen(val route: String) {
     object Categories : Screen("categories")
     object Search : Screen("search")
     object Settings : Screen("settings")
-    object MutualFundList : Screen("mutual_fund_list")
+    object MutualFundList : Screen("mutual_funds/{categoryId}") {
+        fun createRoute(categoryId: Int) = "mutual_funds/$categoryId"
+    }
+    object MutualFundSubcategory : Screen("mutual_funds/{categoryId}/{subcategoryId}") {
+        fun createRoute(categoryId: Int, subcategoryId: Int) = "mutual_funds/$categoryId/$subcategoryId"
+    }
     object FundDetail : Screen("fund_detail/{schemeCode}")
+    object Profile : Screen("profile")
 
     fun withArgs(vararg args: String): String {
         return buildString {
@@ -70,7 +80,8 @@ fun AppNavigation(
                 onInvestmentClick = { investment ->
                     selectedInvestmentForDetails = investment
                     navController.navigate(Screen.InvestmentDetail.route)
-                }
+                },
+                user = currentUserState
             )
         }
         
@@ -86,19 +97,60 @@ fun AppNavigation(
         composable(Screen.MutualFunds.route) {
             MutualFundScreen(
                 onCategorySelected = { category ->
-                    navController.navigate("mutual_funds/${category.id}")
+                    if (category.id == 5) { // Debt Fund
+                        // Navigate to subcategories list
+                        navController.navigate(Screen.MutualFundList.createRoute(category.id))
+                    } else {
+                        // Navigate directly to fund list for other categories
+                        navController.navigate(Screen.MutualFundList.createRoute(category.id))
+                    }
                 }
             )
         }
         
-        composable("mutual_funds/{categoryId}") { backStackEntry ->
-            val categoryId = backStackEntry.arguments?.getString("categoryId")?.toIntOrNull() ?: 1
+        composable(
+            route = Screen.MutualFundList.route,
+            arguments = listOf(
+                navArgument("categoryId") { type = NavType.IntType }
+            )
+        ) { backStackEntry ->
+            val categoryId = backStackEntry.arguments?.getInt("categoryId") ?: return@composable
             val category = MutualFundCategories.categories.find { it.id == categoryId }
+            
             if (category != null) {
                 MutualFundListScreen(
                     category = category,
                     apiService = apiService,
-                    onBackPressed = { navController.navigateUp() }
+                    onBackPressed = { navController.navigateUp() },
+                    onSubcategorySelected = { subcategoryId ->
+                        if (categoryId == 5) { // Debt Fund
+                            navController.navigate(
+                                Screen.MutualFundSubcategory.createRoute(categoryId, subcategoryId)
+                            )
+                        }
+                    }
+                )
+            }
+        }
+        
+        composable(
+            route = Screen.MutualFundSubcategory.route,
+            arguments = listOf(
+                navArgument("categoryId") { type = NavType.IntType },
+                navArgument("subcategoryId") { type = NavType.IntType }
+            )
+        ) { backStackEntry ->
+            val categoryId = backStackEntry.arguments?.getInt("categoryId") ?: return@composable
+            val subcategoryId = backStackEntry.arguments?.getInt("subcategoryId") ?: return@composable
+            val category = MutualFundCategories.categories.find { it.id == categoryId }
+            val subcategory = DebtFundSubcategories.subcategories.find { it.id == subcategoryId }
+            
+            if (category != null && subcategory != null) {
+                MutualFundListScreen(
+                    category = category,
+                    apiService = apiService,
+                    onBackPressed = { navController.navigateUp() },
+                    selectedSubcategory = subcategory
                 )
             }
         }

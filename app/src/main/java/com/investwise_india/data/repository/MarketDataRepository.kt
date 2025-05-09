@@ -21,7 +21,7 @@ class MarketDataRepository {
     private val CACHE_DURATION = 5 * 60 * 1000
     
     // API configuration
-    private val YAHOO_API_KEY = "5ebf944549mshee20ac54189c760p155765jsn57e4f50da44c"
+        private val YAHOO_API_KEY = "5ebf944549mshee20ac54189c760p155765jsn57e4f50da44c"
     private val YAHOO_API_HOST = "yahoo-finance15.p.rapidapi.com"
     
     // Market index symbols

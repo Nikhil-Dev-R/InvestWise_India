@@ -44,11 +44,13 @@ import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.random.Random
+import com.google.firebase.auth.FirebaseUser
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    onInvestmentClick: (InvestmentOption) -> Unit = {}
+    onInvestmentClick: (InvestmentOption) -> Unit = {},
+    user: FirebaseUser? = null
 ) {
     val scrollState = rememberScrollState()
     var selectedTab by remember { mutableStateOf(TabOption.ALL) }
@@ -76,7 +78,7 @@ fun HomeScreen(
                 .verticalScroll(scrollState)
         ) {
             // Modern header with gradient
-            PortfolioHeader(portfolioValue, portfolioGrowth)
+            PortfolioHeader(portfolioValue, portfolioGrowth, user)
             
             Spacer(modifier = Modifier.height(20.dp))
             
@@ -87,7 +89,7 @@ fun HomeScreen(
                         slideInVertically(animationSpec = tween(durationMillis = 20, delayMillis = 25))
                         { fullHeight -> fullHeight / 5 }
             ) {
-                QuickActionRow()
+//                QuickActionRow()
             }
             
             Spacer(modifier = Modifier.height(24.dp))
@@ -161,11 +163,11 @@ fun HomeScreen(
 }
 
 @Composable
-fun PortfolioHeader(portfolioValue: Double, portfolioGrowth: Double) {
+fun PortfolioHeader(portfolioValue: Double, portfolioGrowth: Double, user: FirebaseUser? = null) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(180.dp)
+            .height(120.dp)
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
@@ -196,8 +198,11 @@ fun PortfolioHeader(portfolioValue: Double, portfolioGrowth: Double) {
                         else -> "Good Evening"
                     }
                     
+                    // Get user's name or use "Investor" as fallback
+                    val displayName = user?.displayName?.takeIf { it.isNotBlank() }?.split(" ")?.first() ?: "Investor"
+                    
                     Text(
-                        text = "$greeting, Investor!",
+                        text = "$greeting, $displayName!",
                         style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.onPrimary,
                         fontWeight = FontWeight.Bold
@@ -225,136 +230,71 @@ fun PortfolioHeader(portfolioValue: Double, portfolioGrowth: Double) {
                     )
                 }
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            // Portfolio value section
-            Column(modifier = Modifier.fillMaxWidth()) {
-                Text(
-                    text = "Your Portfolio",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
-                )
-                
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "₹${NumberFormat.getNumberInstance(Locale.US).format(portfolioValue)}",
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
-                    
-                    // Growth rate
-                    Card(
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color(0xFF4CAF50).copy(alpha = 0.2f)
-                        ),
-                        shape = RoundedCornerShape(16.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.TrendingUp,
-                                contentDescription = "Trending Up",
-                                tint = Color(0xFF4CAF50),
-                                modifier = Modifier.size(16.dp)
-                            )
-                            
-                            Spacer(modifier = Modifier.width(4.dp))
-                            
-                            Text(
-                                text = "+${String.format("%.2f", portfolioGrowth)}%",
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.Medium,
-                                color = Color(0xFF8F1B1B)
-                            )
-                        }
-                    }
-                }
-            }
         }
     }
 }
 
-@Composable
-fun QuickActionRow() {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp),
-        horizontalArrangement = Arrangement.SpaceEvenly
-    ) {
-        QuickActionButton(
-            icon = Icons.Default.AddCircle,
-            text = "Invest",
-            color = MaterialTheme.colorScheme.primary
-        )
+//@Composable
+//fun QuickActionRow() {
+//    Row(
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .padding(horizontal = 16.dp),
+//        horizontalArrangement = Arrangement.SpaceEvenly
+//    ) {
+//        QuickActionButton(
+//            icon = Icons.Default.Compare,
+//            text = "Compare",
+//            color = MaterialTheme.colorScheme.tertiary
+//        )
+//
+//        QuickActionButton(
+//            icon = Icons.Default.PieChart,
+//            text = "Analysis",
+//            color = MaterialTheme.colorScheme.error
+//        )
+//    }
+//}
 
-        QuickActionButton(
-            icon = Icons.Default.Inventory,
-            text = "My Funds",
-            color = MaterialTheme.colorScheme.secondary
-        )
-
-        QuickActionButton(
-            icon = Icons.Default.Compare,
-            text = "Compare",
-            color = MaterialTheme.colorScheme.tertiary
-        )
-
-        QuickActionButton(
-            icon = Icons.Default.PieChart,
-            text = "Analysis",
-            color = MaterialTheme.colorScheme.error
-        )
-    }
-}
-
-@Composable
-fun QuickActionButton(icon: ImageVector, text: String, color: Color) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .width(80.dp)
-            .clickable { /* Handle click */ }
-    ) {
-        Box(
-            modifier = Modifier
-                .size(52.dp)
-                .clip(RoundedCornerShape(14.dp))
-                .background(color.copy(alpha = 0.1f))
-                .border(
-                    width = 1.dp,
-                    color = color.copy(alpha = 0.3f),
-                    shape = RoundedCornerShape(14.dp)
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = text,
-                tint = color,
-                modifier = Modifier.size(28.dp)
-            )
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text = text,
-            style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Medium,
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.onBackground
-        )
-    }
-}
+//@Composable
+//fun QuickActionButton(icon: ImageVector, text: String, color: Color) {
+//    Column(
+//        horizontalAlignment = Alignment.CenterHorizontally,
+//        modifier = Modifier
+//            .width(80.dp)
+//            .clickable { /* Handle click */ }
+//    ) {
+//        Box(
+//            modifier = Modifier
+//                .size(52.dp)
+//                .clip(RoundedCornerShape(14.dp))
+//                .background(color.copy(alpha = 0.1f))
+//                .border(
+//                    width = 1.dp,
+//                    color = color.copy(alpha = 0.3f),
+//                    shape = RoundedCornerShape(14.dp)
+//                ),
+//            contentAlignment = Alignment.Center
+//        ) {
+//            Icon(
+//                imageVector = icon,
+//                contentDescription = text,
+//                tint = color,
+//                modifier = Modifier.size(28.dp)
+//            )
+//        }
+//
+//        Spacer(modifier = Modifier.height(8.dp))
+//
+//        Text(
+//            text = text,
+//            style = MaterialTheme.typography.bodyMedium,
+//            fontWeight = FontWeight.Medium,
+//            textAlign = TextAlign.Center,
+//            color = MaterialTheme.colorScheme.onBackground
+//        )
+//    }
+//}
 
 @Composable
 fun MarketOverviewCard() {
@@ -367,46 +307,52 @@ fun MarketOverviewCard() {
     var lastUpdated by remember { mutableStateOf("") }
     var initialLoadDone by remember { mutableStateOf(false) }
     
-    // Coroutine scope for async operations
+    // Remember coroutine scope
     val coroutineScope = rememberCoroutineScope()
     
     // Function to load market data
-    val loadMarketData = {
-        coroutineScope.launch {
-            isLoading = true
-            try {
-                // Fetch the latest data
-                val newData = marketRepository.fetchMarketIndices(forceRefresh = true)
-                if (newData.isNotEmpty()) {
-                    indicesData = newData
+    val loadMarketData = remember {
+        {
+            coroutineScope.launch {
+                isLoading = true
+                try {
+                    // Fetch the latest data
+                    val newData = marketRepository.fetchMarketIndices(forceRefresh = true)
+                    if (newData.isNotEmpty()) {
+                        indicesData = newData
+                    }
+                    
+                    // Update the last updated time
+                    val dateFormat = SimpleDateFormat("hh:mm a", Locale.getDefault())
+                    lastUpdated = "Last updated: ${dateFormat.format(Date())}"
+                    initialLoadDone = true
+                } catch (e: Exception) {
+                    // If there's an error, we still have default values
+                    println("Error loading market data: ${e.message}")
+                } finally {
+                    isLoading = false
                 }
-                
-                // Update the last updated time
-                val dateFormat = SimpleDateFormat("hh:mm a", Locale.getDefault())
-                lastUpdated = "Last updated: ${dateFormat.format(Date())}"
-                initialLoadDone = true
-            } catch (e: Exception) {
-                // If there's an error, we still have default values
-                println("Error loading market data: ${e.message}")
-            } finally {
-                isLoading = false
             }
         }
     }
     
     // Only check for cached data on first composition, don't fetch from network
     LaunchedEffect(Unit) {
-        // Just use cached data if available, don't make network request
-        val cachedData = marketRepository.getCachedOrDefaultIndices()
-        if (cachedData.isNotEmpty()) {
-            indicesData = cachedData
-            
-            // If we have real data (not defaults), set the last updated time
-            if (marketRepository.marketIndices.value.isNotEmpty()) {
-                val dateFormat = SimpleDateFormat("hh:mm a", Locale.getDefault())
-                lastUpdated = "Last updated: ${dateFormat.format(Date())}"
-                initialLoadDone = true
+        try {
+            // Just use cached data if available, don't make network request
+            val cachedData = marketRepository.getCachedOrDefaultIndices()
+            if (cachedData.isNotEmpty()) {
+                indicesData = cachedData
+                
+                // If we have real data (not defaults), set the last updated time
+                if (marketRepository.marketIndices.value.isNotEmpty()) {
+                    val dateFormat = SimpleDateFormat("hh:mm a", Locale.getDefault())
+                    lastUpdated = "Last updated: ${dateFormat.format(Date())}"
+                    initialLoadDone = true
+                }
             }
+        } catch (e: Exception) {
+            println("Error loading cached data: ${e.message}")
         }
     }
     
@@ -590,7 +536,7 @@ fun InvestmentTypeSegmentedControl(
                 shape = RoundedCornerShape(20.dp)
             )
     ) {
-        TabOption.values().forEach { tab ->
+        TabOption.entries.forEach { tab ->
             val isSelected = tab == selectedTab
             val buttonColor = if (isSelected) {
                 MaterialTheme.colorScheme.primary
@@ -632,125 +578,159 @@ fun InvestmentCard(
     investment: InvestmentOption,
     onCardClick: (InvestmentOption) -> Unit = {}
 ) {
-    val typeColor = when (investment.type) {
-        InvestmentType.FIXED_RETURN -> FixedReturnColor
-        InvestmentType.ABSOLUTE_RETURN -> AbsoluteReturnColor
-    }
-
     Card(
         modifier = Modifier
             .fillMaxWidth()
+            .height(430.dp)
             .clip(RoundedCornerShape(12.dp))
-            .border(
-                width = 1.dp,
-                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f),
-                shape = RoundedCornerShape(12.dp)
-            )
             .clickable { onCardClick(investment) },
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
+            containerColor = Color(0xFF41474D) // Dark blue background
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .fillMaxHeight()
                 .padding(16.dp)
         ) {
             // Header row with investment name and type tag
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Top
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                // Investment name - constrained width
+                // Investment name
                 Text(
                     text = investment.name,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
+                    color = Color.White,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f, fill = false)
                 )
 
-                Spacer(modifier = Modifier.width(8.dp))
-
-                // Type tag - fixed size, won't move
+                // Type tag
                 Text(
                     text = when (investment.type) {
-                        InvestmentType.FIXED_RETURN -> "FIXED"
-                        InvestmentType.ABSOLUTE_RETURN -> "VARIABLE"
+                        InvestmentType.FIXED_RETURN -> "FIXED RETURN"
+                        InvestmentType.ABSOLUTE_RETURN -> "VARIABLE RETURN"
                     },
                     style = MaterialTheme.typography.labelSmall,
-                    color = typeColor,
+                    color = Color.White,
                     modifier = Modifier
                         .background(
-                            color = typeColor.copy(alpha = 0.1f),
+                            color = Color(0xFF2196F3),
                             shape = RoundedCornerShape(4.dp)
                         )
                         .padding(horizontal = 8.dp, vertical = 4.dp)
                 )
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Description - fixed height
-            Text(
-                text = investment.description,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.height(36.dp)
-            )
-
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Bottom attributes row - fixed layout
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.7f),
-                        shape = RoundedCornerShape(8.dp)
-                    )
-                    .padding(vertical = 8.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly
+            // Description
+            Text(
+                text = investment.description,
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.White.copy(alpha = 0.9f),
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Detailed attributes in a column layout
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                // Each attribute in a fixed-width column
-                Box(modifier = Modifier.weight(1f)) {
-                    InvestmentAttribute("Risk", investment.riskLevel)
+                // Risk Level
+                DetailRow(
+                    label = "Risk Level:",
+                    value = investment.riskLevel,
+                    labelWidth = 0.4f
+                )
+                
+                // Return Potential
+                DetailRow(
+                    label = "Return Potential:",
+                    value = investment.returnPotential,
+                    labelWidth = 0.4f
+                )
+                
+                // Liquidity (sample - you may need to add this to your InvestmentOption class)
+                val liquidity = when (investment.name) {
+                    "Fixed Deposit (FD)" -> "Medium (Premature withdrawal available with penalty)"
+                    "Public Provident Fund (PPF)" -> "Low (15-year lock-in period, partial withdrawal allowed after 7 years)"
+                    else -> "Medium"
                 }
-                Box(modifier = Modifier.weight(1f)) {
-                    InvestmentAttribute("Return", investment.returnPotential)
+                DetailRow(
+                    label = "Liquidity:",
+                    value = liquidity,
+                    labelWidth = 0.4f
+                )
+                
+                // Tax Benefits (sample - you may need to add this to your InvestmentOption class)
+                val taxBenefits = when (investment.name) {
+                    "Public Provident Fund (PPF)" -> "EEE (Exempt-Exempt-Exempt) status under Section 80C"
+                    else -> "No tax benefits, interest is taxable"
                 }
-                Box(modifier = Modifier.weight(1f)) {
-                    InvestmentAttribute("Min", investment.minimumInvestment)
+                DetailRow(
+                    label = "Tax Benefits:",
+                    value = taxBenefits,
+                    labelWidth = 0.4f
+                )
+                
+                // Minimum Investment
+                DetailRow(
+                    label = "Minimum Investment:",
+                    value = investment.minimumInvestment,
+                    labelWidth = 0.4f
+                )
+                
+                // Time Horizon (sample - you may need to add this to your InvestmentOption class)
+                val timeHorizon = when (investment.name) {
+                    "Fixed Deposit (FD)" -> "6 months - 10 years"
+                    "Public Provident Fund (PPF)" -> "15 years"
+                    "Kisan Vikas Patra (KVP)" -> "10 years"
+                    else -> "3-5 years"
                 }
+                DetailRow(
+                    label = "Recommended Time Horizon:",
+                    value = timeHorizon,
+                    labelWidth = 0.4f
+                )
             }
         }
     }
 }
 
 @Composable
-fun InvestmentAttribute(label: String, value: String) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxWidth() // Fill the parent Box width
+fun DetailRow(
+    label: String,
+    value: String,
+    labelWidth: Float = 0.3f
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.Top
     ) {
         Text(
             text = label,
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+            style = MaterialTheme.typography.bodyMedium,
+            color = Color.White,
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier.fillMaxWidth(labelWidth)
         )
-
+        
         Text(
             text = value,
             style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Medium,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis, // Add text truncation
-            textAlign = TextAlign.Center
+            color = Color.White,
+            modifier = Modifier.fillMaxWidth()
         )
     }
 }
@@ -761,7 +741,7 @@ fun HomeScreenPreview() {
     InvestWise_IndiaTheme {
         Box {
             Row {
-                 HomeScreen(onInvestmentClick = {})
+                 HomeScreen(onInvestmentClick = {}, user = null)
                 // QuickActionRow()
                 // MarketOverviewCard()
                 // InvestmentTypeSegmentedControl(selectedTab = TabOption.ALL, onTabSelected = {})

@@ -38,6 +38,8 @@ import com.investwise_india.data.repository.MutualFundRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import androidx.compose.runtime.remember
+import com.investwise_india.model.DebtFundSubcategories
+import com.investwise_india.model.DebtFundSubcategory
 
 // The MutualFundRepository is used for consistent ratio calculations
 private lateinit var mutualFundRepository: MutualFundRepository
@@ -46,7 +48,9 @@ private lateinit var mutualFundRepository: MutualFundRepository
 fun MutualFundListScreen(
     category: MutualFundCategory,
     apiService: MutualFundApiService,
-    onBackPressed: () -> Unit
+    onBackPressed: () -> Unit,
+    onSubcategorySelected: ((Int) -> Unit)? = null,
+    selectedSubcategory: DebtFundSubcategory? = null
 ) {
     // Initialize the repository if it hasn't been already
     if (!::mutualFundRepository.isInitialized) {
@@ -58,23 +62,25 @@ fun MutualFundListScreen(
     var error by remember { mutableStateOf<String?>(null) }
 
     // Define scheme codes for each category
-    val categorySchemes = remember(category) {
+    val categorySchemes = remember(category, selectedSubcategory) {
         when (category.id) {
+            5 -> { // Debt Fund
+                selectedSubcategory?.schemeCodes ?: emptyList()
+            }
             1 -> listOf(118632, 120586, 119598, 119250) // Large Cap
             2 -> listOf(127042, 118989, 118668, 125307, 119775, 120841) // Mid Cap
             3 -> listOf(147946, 118778, 120828, 148618, 125354, 130503) // Small Cap
             4 -> listOf(120484, 120251, 118624, 120674, 143537, 120819, 119019) // Hybrid
-            5 -> listOf(118535, 118839, 120688, 125499, 118572) // Debt (Not Updated)
             6 -> listOf(120847, 120270, 119723, 133386, 119242) // ELSS
             7 -> listOf(120843, 122639, 118955, 129046, 120492) // Flexicap
             8 -> listOf(120700, 148747, 152064) // Thematic
             9 -> listOf(147622, 148555, 148807, 148726, 149892, 149389) // Index
-            10 -> listOf(118545, 118849, 120698, 125504, 118582) // International (Not updated)
+            10 -> listOf(118545, 118849, 120698, 125504, 118582) // International
             else -> emptyList()
         }
     }
     
-    LaunchedEffect(category) {
+    LaunchedEffect(category, selectedSubcategory) {
         isLoading = true
         error = null
         mutualFunds = emptyList()
@@ -142,7 +148,11 @@ fun MutualFundListScreen(
                 }
                 
                 Text(
-                    text = category.name,
+                    text = if (category.id == 5 && selectedSubcategory != null) {
+                        selectedSubcategory.name
+                    } else {
+                        category.name
+                    },
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground
@@ -151,84 +161,124 @@ fun MutualFundListScreen(
                 // Empty box to balance the layout
                 Box(modifier = Modifier.size(48.dp))
             }
-            
-            // Display loading, error, or content
-            when {
-                error != null -> {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Text(
-                                text = error ?: "Unknown error",
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.error,
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier.padding(horizontal = 16.dp)
-                            )
-                            
-                            Spacer(modifier = Modifier.height(16.dp))
-                            
-                            Button(
-                                onClick = {
-                                    isLoading = true
-                                    error = null
-                                },
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = MaterialTheme.colorScheme.primary
-                                )
-                            ) {
-                                Text("Retry")
-                            }
-                        }
-                    }
-                }
-                else -> {
-                    if (mutualFunds.isNotEmpty()) {
-                        Text(
-                            text = "Available Funds",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onBackground,
-                            modifier = Modifier.padding(horizontal = 16.dp)
+
+            // Show subcategories for Debt Fund
+            if (category.id == 5 && selectedSubcategory == null) {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(DebtFundSubcategories.subcategories) { subcategory ->
+                        SubcategoryCard(
+                            subcategory = subcategory,
+                            onClick = { onSubcategorySelected?.invoke(subcategory.id) }
                         )
                     }
-                    
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f),
-                        contentPadding = PaddingValues(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        items(
-                            items = mutualFunds,
-                            key = { it.schemeCode }
-                        ) { fund ->
-                            MutualFundItem(fund = fund, apiService = apiService)
+                }
+            } else {
+                // Display loading, error, or content
+                when {
+                    isLoading -> {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(16.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
+                    }
+                    error != null -> {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(16.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = error!!,
+                                color = MaterialTheme.colorScheme.error,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
+                    else -> {
+                        if (mutualFunds.isNotEmpty()) {
+                            Text(
+                                text = "Available Funds",
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onBackground,
+                                modifier = Modifier.padding(horizontal = 16.dp)
+                            )
                         }
                         
-                        item {
-                            if (isLoading) {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(16.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    CircularProgressIndicator()
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f),
+                            contentPadding = PaddingValues(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            items(
+                                items = mutualFunds,
+                                key = { it.schemeCode }
+                            ) { fund ->
+                                MutualFundItem(fund = fund, apiService = apiService)
+                            }
+                            
+                            item {
+                                if (isLoading) {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(16.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        CircularProgressIndicator()
+                                    }
                                 }
                             }
                         }
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun SubcategoryCard(
+    subcategory: DebtFundSubcategory,
+    onClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Text(
+                text = subcategory.name,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+            
+            Spacer(modifier = Modifier.height(4.dp))
+            
+            Text(
+                text = subcategory.description,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+            )
         }
     }
 }
@@ -579,7 +629,9 @@ fun PreviewMutualFundListScreen() {
         MutualFundListScreen(
             category = mockCategory,
             apiService = mockApiService,
-            onBackPressed = {}
+            onBackPressed = {},
+            onSubcategorySelected = null,
+            selectedSubcategory = null
         )
     }
 }

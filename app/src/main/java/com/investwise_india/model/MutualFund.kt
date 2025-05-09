@@ -15,6 +15,13 @@ data class MutualFundCategory(
     val colorResId: Int
 )
 
+data class DebtFundSubcategory(
+    val id: Int,
+    val name: String,
+    val description: String,
+    val schemeCodes: List<Int>
+)
+
 // Define fund categories
 object MutualFundCategories {
     val categories = listOf(
@@ -87,6 +94,42 @@ object MutualFundCategories {
             "Investments in foreign markets",
             com.investwise_india.R.drawable.ic_international,
             com.investwise_india.R.color.international_color
+        )
+    )
+}
+
+// Define debt fund subcategories
+object DebtFundSubcategories {
+    val subcategories = listOf(
+        DebtFundSubcategory(
+            1,
+            "Low Duration",
+            "Funds with portfolio duration between 6 months to 1 year",
+            listOf(143612, 120398, 119523, 118942, 133810, 120513, 118709) // Scheme codes
+        ),
+        DebtFundSubcategory(
+            2,
+            "Overnight Fund",
+            "Funds investing in overnight securities",
+            listOf(145810, 147951, 146675) //scheme codes
+        ),
+        DebtFundSubcategory(
+            3,
+            "Liquid Fund",
+            "Funds investing in money market instruments",
+            listOf(120837, 118701, 139538, 119568, 120197, 119766) //scheme codes
+        ),
+        DebtFundSubcategory(
+            4,
+            "Ultra Short Duration",
+            "Funds with portfolio duration between 3-6 months",
+            listOf(120746, 143494, 119205) // Scheme codes
+        ),
+        DebtFundSubcategory(
+            5,
+            "Floating Rate",
+            "Funds investing in floating rate instruments",
+            listOf(120425, 149049) //Scheme codes
         )
     )
 } 
