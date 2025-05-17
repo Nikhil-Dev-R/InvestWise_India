@@ -24,34 +24,34 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        
-        // Get the web client ID from google-services.json
+
+        // Get the web client ID
         val webClientId = getString(R.string.default_web_client_id)
-        
+
         // Start background data loading
         MutualFundDataWorker.scheduleOneTimeWork(this)
-        
+
         setContent {
             InvestWise_IndiaTheme {
                 val navController = rememberNavController()
                 val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
-                
+
                 // Initialize Firebase Auth
                 val auth = FirebaseAuth.getInstance()
                 var currentUser by remember { mutableStateOf(auth.currentUser) }
-                
+
                 // Listen for auth state changes
                 DisposableEffect(Unit) {
                     val authStateListener = FirebaseAuth.AuthStateListener { firebaseAuth ->
                         currentUser = firebaseAuth.currentUser
                     }
                     auth.addAuthStateListener(authStateListener)
-                    
+
                     onDispose {
                         auth.removeAuthStateListener(authStateListener)
                     }
                 }
-                
+
                 // Determine if we should show the bottom bar
                 val showBottomBar = currentRoute in listOf(
                     Screen.Home.route,
@@ -59,11 +59,11 @@ class MainActivity : ComponentActivity() {
                     Screen.MutualFunds.route,
                     Screen.Account.route
                 )
-                
+
                 // Observe mutual fund data loading state
                 val dataLoaded by DataModule.mutualFundRepository.dataLoaded.collectAsState(initial = false)
                 val isLoading by DataModule.mutualFundRepository.isLoading.collectAsState(initial = false)
-                
+
                 // Log the data loading state
                 LaunchedEffect(dataLoaded, isLoading) {
                     if (dataLoaded) {
@@ -72,7 +72,7 @@ class MainActivity : ComponentActivity() {
                         android.util.Log.d("MainActivity", "Loading mutual fund data...")
                     }
                 }
-                
+
                 Scaffold(
                     bottomBar = {
                         BottomNavigationBar(

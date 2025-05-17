@@ -26,6 +26,10 @@ val OnTertiaryDark = Color(0xFF000000) // Black
 val OnBackgroundDark = Color(0xFFE1E1E1) // Light Gray
 val OnSurfaceDark = Color(0xFFE1E1E1) // Light Gray
 
+
+val ColorUserMessage = Color(0xFF03A9F4)
+val ColorModelMessage = Color(0xFF4CAF50)
+
 // Additional Colors
 val FixedReturnColor = Color(0xFF4A9CDB) // Blue for Fixed Return investments
 val AbsoluteReturnColor = Color(0xFFF2994A) // Orange for Absolute Return investments

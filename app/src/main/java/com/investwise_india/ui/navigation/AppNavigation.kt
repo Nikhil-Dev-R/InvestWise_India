@@ -1,6 +1,8 @@
 package com.investwise_india.ui.navigation
 
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -29,6 +31,7 @@ sealed class Screen(val route: String) {
     object Categories : Screen("categories")
     object Search : Screen("search")
     object Settings : Screen("settings")
+    object ChatBot : Screen("chatbot")
     object MutualFundList : Screen("mutual_funds/{categoryId}") {
         fun createRoute(categoryId: Int) = "mutual_funds/$categoryId"
     }
@@ -58,14 +61,14 @@ fun AppNavigation(
 ) {
     var showSelectFundDialog by remember { mutableStateOf(false) }
     var selectedFunds by remember { mutableStateOf<List<MutualFund>>(emptyList()) }
-    
+
     // State for holding the selected investment for details screen
     var selectedInvestmentForDetails by remember { mutableStateOf<InvestmentOption?>(null) }
-    
+
     // Initialize Firebase Auth
     val auth = remember { FirebaseAuth.getInstance() }
     var currentUserState by remember { mutableStateOf(currentUser) }
-    
+
     // Update currentUserState when currentUser changes
     LaunchedEffect(currentUser) {
         currentUserState = currentUser
@@ -84,7 +87,7 @@ fun AppNavigation(
                 user = currentUserState
             )
         }
-        
+
         composable(Screen.Compare.route) {
             CompareScreen(
                 apiService = apiService,
@@ -93,7 +96,14 @@ fun AppNavigation(
                 onRemoveFund = { /* This is now handled by the ViewModel */ }
             )
         }
-        
+
+        composable(Screen.ChatBot.route) {
+            ChatPage(
+                modifier = Modifier,
+                viewModel = viewModel()
+            )
+        }
+
         composable(Screen.MutualFunds.route) {
             MutualFundScreen(
                 onCategorySelected = { category ->
@@ -107,7 +117,7 @@ fun AppNavigation(
                 }
             )
         }
-        
+
         composable(
             route = Screen.MutualFundList.route,
             arguments = listOf(
@@ -116,7 +126,7 @@ fun AppNavigation(
         ) { backStackEntry ->
             val categoryId = backStackEntry.arguments?.getInt("categoryId") ?: return@composable
             val category = MutualFundCategories.categories.find { it.id == categoryId }
-            
+
             if (category != null) {
                 MutualFundListScreen(
                     category = category,
@@ -132,7 +142,7 @@ fun AppNavigation(
                 )
             }
         }
-        
+
         composable(
             route = Screen.MutualFundSubcategory.route,
             arguments = listOf(
@@ -144,7 +154,7 @@ fun AppNavigation(
             val subcategoryId = backStackEntry.arguments?.getInt("subcategoryId") ?: return@composable
             val category = MutualFundCategories.categories.find { it.id == categoryId }
             val subcategory = DebtFundSubcategories.subcategories.find { it.id == subcategoryId }
-            
+
             if (category != null && subcategory != null) {
                 MutualFundListScreen(
                     category = category,
@@ -154,7 +164,7 @@ fun AppNavigation(
                 )
             }
         }
-        
+
         composable(Screen.Account.route) {
             AccountScreen(
                 user = currentUserState,
@@ -173,7 +183,7 @@ fun AppNavigation(
                 }
             )
         }
-        
+
         composable(Screen.Auth.route) {
             // Auth screen - only shown when user chooses to sign in
             AuthScreen(
@@ -188,7 +198,7 @@ fun AppNavigation(
                 }
             )
         }
-        
+
         composable(Screen.InvestmentDetail.route) {
             // Only show the detail screen if we have a selected investment
             selectedInvestmentForDetails?.let { investment ->
