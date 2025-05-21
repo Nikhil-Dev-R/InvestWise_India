@@ -2,6 +2,8 @@ package com.investwise_india.auth
 
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -125,22 +127,23 @@ class AuthViewModel : ViewModel() {
         }
     }
     
-    fun updateUserDisplayName(displayName: String) {
+    fun updateUserDisplayName(displayName: String, context: Context) {
         viewModelScope.launch {
             try {
+                Toast.makeText(context, "Reach in UpdateUserDisplayName", Toast.LENGTH_SHORT).show()
                 _authState.value = AuthState.Loading
-                
-                val user = auth.currentUser
+                val user = FirebaseAuth.getInstance().currentUser
                 if (user != null) {
                     val profileUpdates = UserProfileChangeRequest.Builder()
                         .setDisplayName(displayName)
                         .build()
-                    
+                    Toast.makeText(context, "Profile updated", Toast.LENGTH_SHORT).show()
                     user.updateProfile(profileUpdates).await()
                     
                     // Force refresh the current user to get updated profile
                     user.reload().await()
-                    _currentUser.value = auth.currentUser
+                    // Now we can use reloaded user
+                    _currentUser.value = FirebaseAuth.getInstance().currentUser
                     
                     _authState.value = AuthState.Success
                 } else {

@@ -2,6 +2,9 @@ package com.investwise_india.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.investwise_india.data.DataModule
 import com.investwise_india.model.MutualFund
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,6 +17,11 @@ import kotlinx.coroutines.launch
  * for user account related functionality.
  */
 class AccountViewModel : ViewModel() {
+
+    private val auth = FirebaseAuth.getInstance()
+    private val _currentUser = MutableStateFlow<FirebaseUser?>(auth.currentUser)
+    val currentUser: StateFlow<FirebaseUser?> = _currentUser
+//    val account = GoogleSignIn.getLastSignedInAccount(context)
 
     // Repository
     private val repository = DataModule.mutualFundRepository
@@ -65,18 +73,13 @@ class AccountViewModel : ViewModel() {
     private fun checkLoginStatus() {
         viewModelScope.launch {
             _isLoading.value = true
-            
-            // Simulate checking login status
-            // In a real app, this would check with your authentication service
-            val isLoggedIn = false // Replace with actual authentication check
-            
-            _isLoggedIn.value = isLoggedIn
-            
-            if (isLoggedIn) {
+
+            if (currentUser.value != null) {
+                _isLoggedIn.value = true
                 loadUserData()
+            } else {
+                _isLoggedIn.value = false
             }
-            
-            _isLoading.value = false
         }
     }
 
@@ -90,11 +93,10 @@ class AccountViewModel : ViewModel() {
             
             try {
                 // Load user profile data
-                // In a real app, this would come from your user service
-                _userName.value = "John Doe"
-                _userEmail.value = "john.doe@example.com"
-                _userPhoneNumber.value = "+91 9876543210"
-                _userProfilePicture.value = null // URL to profile picture
+
+                _userName.value = currentUser.value?.displayName
+                _userEmail.value = currentUser.value?.email
+                _userProfilePicture.value = currentUser.value?.photoUrl.toString()
                 
                 // Load user's favorite funds
                 val favorites = repository.getUserFavoriteFunds()

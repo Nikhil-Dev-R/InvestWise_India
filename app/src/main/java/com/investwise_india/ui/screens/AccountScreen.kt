@@ -2,6 +2,7 @@ package com.investwise_india.ui.screens
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -23,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.google.firebase.auth.FirebaseUser
@@ -558,8 +560,8 @@ private fun LoggedInSection(
         EditProfileDialog(
             currentName = user?.displayName ?: "",
             onDismiss = { showEditProfileDialog = false },
-            onSave = { newName ->
-                onUpdateProfile(newName)
+            onSave = {
+                onUpdateProfile(it)
                 showEditProfileDialog = false
             }
         )
@@ -977,5 +979,40 @@ private fun ElevatedAccountMenuItem(
 
 // Helper function to show a toast message
 private fun showToast(context: Context, message: String) {
-    android.widget.Toast.makeText(context, message, android.widget.Toast.LENGTH_SHORT).show()
+    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+}
+
+@Preview(showBackground = true)
+//@Composable
+//fun EditProfileDialogPreview() {
+//        EditProfileDialog(
+//            currentName = "Jay",
+//            onDismiss = {},
+//            onSave = {}
+//        )
+//    }
+//@Composable
+//fun FeaturesDialogPreview(){
+//    FeaturesDialog(
+//        onDismiss = {}
+//    )
+//}
+//@Composable
+//fun FeatureItemPreview(){
+//    FeatureItem(
+//        icon = Icons.Default.Home,
+//        title = "Dashboard",
+//        description = "View all your investments and performance at a glance"
+//    )
+//}
+@Composable
+fun AccountScreenPreview(){
+    AccountScreen(
+        user = null,
+        onSignInClick = {},
+        onSignOutClick = {},
+        onEmailSignInClick = {_, _ ->},
+        onEmailSignUpClick = {_, _, _ ->},
+        onUpdateProfile = {},
+    )
 }
