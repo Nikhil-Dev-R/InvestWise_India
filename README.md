@@ -95,7 +95,7 @@ InvestWise India is a powerful and beginner-friendly **FinTech mobile applicatio
 <div class="screenshot-row">
   <p align = "center">
   <img src="https://github.com/user-attachments/assets/d3b59a5c-a53c-452c-9117-12b578036ea0"alt="Home Screen" width="300"/>  &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;
-  <img src="https://github.com/user-attachments/assets/35474970-6993-4ca8-adac-bdc080dfc280"alt="Home Screen" width="300"/>   <br>
+  <img src="https://github.com/user-attachments/assets/35474970-6993-4ca8-adac-bdc080dfc280"alt="Home Screen" width="300"/>   <br><br><br>
   <img src="https://github.com/user-attachments/assets/b89736be-58bc-400a-8a6b-037fe1571061"alt="Home Screen" width="300"/>  &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;
   <img src="https://github.com/user-attachments/assets/24ad03e8-a10e-4039-be75-198b5d132e50"alt="Home Screen" width="300"/>
      </p>
@@ -121,7 +121,7 @@ InvestWise India is a powerful and beginner-friendly **FinTech mobile applicatio
 <div class="screenshot-row">
   <p align = "center">
   <img src="https://github.com/user-attachments/assets/e6202440-dad2-4d6b-ab47-a5b9e043355b"alt="Mutual Fund Screen" width="300"/>  &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;
-  <img src="https://github.com/user-attachments/assets/89287606-c67c-4e50-bb46-4afaf8806c7b"alt="Mutual Fund Screen" width="300"/>  <br>
+  <img src="https://github.com/user-attachments/assets/89287606-c67c-4e50-bb46-4afaf8806c7b"alt="Mutual Fund Screen" width="300"/>  <br><br><br>
   <img src="https://github.com/user-attachments/assets/bbc90a84-ed4e-48c0-88e1-f627ea65efe5"alt="Mutual Fund Screen" width="300"/>  &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;
   <img src="https://github.com/user-attachments/assets/56a942f6-0e66-4698-a346-50484c3fddb6"alt="Mutual Fund Screen" width="300"/>
      </p>
