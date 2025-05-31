@@ -78,7 +78,7 @@ InvestWise India is a powerful and beginner-friendly **FinTech mobile applicatio
 
 ## 📸 Screenshots
 # LAUNCH Screen
-![Screenshot_20250521-183632_One UI Home](https://github.com/user-attachments/assets/363b4f88-92cb-43a5-9654-c9b962386f3a) &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; ![Screenshot_20250531-142740_InvestWise India](https://github.com/user-attachments/assets/8c394fd8-eee8-49f4-8c43-6f30196f646f) <br>
+![11][Screenshot_20250521-183632_One UI Home](https://github.com/user-attachments/assets/363b4f88-92cb-43a5-9654-c9b962386f3a) &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; ![Screenshot_20250531-142740_InvestWise India](https://github.com/user-attachments/assets/8c394fd8-eee8-49f4-8c43-6f30196f646f) <br>
 
 # Home Screen
 ![Screenshot_20250521-184235_InvestWise India](https://github.com/user-attachments/assets/d3b59a5c-a53c-452c-9117-12b578036ea0) &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; ![Screenshot_20250521-184248_InvestWise India](https://github.com/user-attachments/assets/35474970-6993-4ca8-adac-bdc080dfc280) <br>
