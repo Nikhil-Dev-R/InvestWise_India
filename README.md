@@ -2,8 +2,9 @@
 
 InvestWise India is a powerful and beginner-friendly **FinTech mobile application** designed to educate users about various investment options and help them make smarter mutual fund decisions. It features AI-powered guidance, curated fund insights, and intuitive tools for comparison — all tailored for users with little or no financial background.
 
-![InvestWise](https://github.com/user-attachments/assets/48f53d2b-6821-4ac1-8ea8-d3b4f100ef96)<br>
-
+<p align="center">
+<img src="https://github.com/user-attachments/assets/48f53d2b-6821-4ac1-8ea8-d3b4f100ef96" alt="APPLICATION LOGO" width="300"/>
+</p>
 
 ---
 
@@ -103,42 +104,55 @@ InvestWise India is a powerful and beginner-friendly **FinTech mobile applicatio
 
 <h2>🚀 Launch Screen</h2>
 <div class="screenshot-row">
-  <img src="https://github.com/user-attachments/assets/363b4f88-92cb-43a5-9654-c9b962386f3a">
-  <img src="https://github.com/user-attachments/assets/8c394fd8-eee8-49f4-8c43-6f30196f646f">
+  <p align = "center">
+  <img src="https://github.com/user-attachments/assets/363b4f88-92cb-43a5-9654-c9b962386f3a"alt="Launch Screen" width="300"/>   &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;
+  <img src="https://github.com/user-attachments/assets/8c394fd8-eee8-49f4-8c43-6f30196f646f"alt="Launch Screen" width="300"/>
+   </p>
 </div>
+
 
 <h2>🏠 Home Screen</h2>
 <div class="screenshot-row">
-  <img src="https://github.com/user-attachments/assets/d3b59a5c-a53c-452c-9117-12b578036ea0">
-  <img src="https://github.com/user-attachments/assets/35474970-6993-4ca8-adac-bdc080dfc280">
-  <img src="https://github.com/user-attachments/assets/b89736be-58bc-400a-8a6b-037fe1571061">
-  <img src="https://github.com/user-attachments/assets/24ad03e8-a10e-4039-be75-198b5d132e50">
+  <p align = "center">
+  <img src="https://github.com/user-attachments/assets/d3b59a5c-a53c-452c-9117-12b578036ea0"alt="Home Screen" width="300"/>  &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;
+  <img src="https://github.com/user-attachments/assets/35474970-6993-4ca8-adac-bdc080dfc280"alt="Home Screen" width="300"/>   <br>
+  <img src="https://github.com/user-attachments/assets/b89736be-58bc-400a-8a6b-037fe1571061"alt="Home Screen" width="300"/>  &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;
+  <img src="https://github.com/user-attachments/assets/24ad03e8-a10e-4039-be75-198b5d132e50"alt="Home Screen" width="300"/>
+     </p>
 </div>
 
 <h2>📊 Fund Comparison Screen</h2>
 <div class="screenshot-row">
-  <img src="https://github.com/user-attachments/assets/d91c50b5-23d4-4a04-a6db-3c095ed814f4">
-  <img src="https://github.com/user-attachments/assets/d2f78092-8a50-499a-89ba-33b418b3b4af">
-  <img src="https://github.com/user-attachments/assets/df75380d-114a-4b4a-8c6e-855e73bc014c">
+  <p align = "center">
+  <img src="https://github.com/user-attachments/assets/d91c50b5-23d4-4a04-a6db-3c095ed814f4"alt="Fund Comparison Screen" width="300"/>  &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;
+  <img src="https://github.com/user-attachments/assets/d2f78092-8a50-499a-89ba-33b418b3b4af"alt="Fund Comparison Screen" width="300"/> &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;
+  <img src="https://github.com/user-attachments/assets/df75380d-114a-4b4a-8c6e-855e73bc014c"alt="Fund Comparison Screen" width="300"/>
+     </p>
 </div>
 
 <h2>🤖 ChatBot Screen</h2>
 <div class="screenshot-row">
-  <img src="https://github.com/user-attachments/assets/6952037f-9999-40a1-b911-41f47581bdea">
+  <p align = "center">
+  <img src="https://github.com/user-attachments/assets/6952037f-9999-40a1-b911-41f47581bdea"alt="ChatBot Screen" width="300"/> &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;
+     </p>
 </div>
 
 <h2>📁 Mutual Fund Screen</h2>
 <div class="screenshot-row">
-  <img src="https://github.com/user-attachments/assets/e6202440-dad2-4d6b-ab47-a5b9e043355b">
-  <img src="https://github.com/user-attachments/assets/89287606-c67c-4e50-bb46-4afaf8806c7b">
-  <img src="https://github.com/user-attachments/assets/bbc90a84-ed4e-48c0-88e1-f627ea65efe5">
-  <img src="https://github.com/user-attachments/assets/56a942f6-0e66-4698-a346-50484c3fddb6">
+  <p align = "center">
+  <img src="https://github.com/user-attachments/assets/e6202440-dad2-4d6b-ab47-a5b9e043355b"alt="Mutual Fund Screen" width="300"/>  &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;
+  <img src="https://github.com/user-attachments/assets/89287606-c67c-4e50-bb46-4afaf8806c7b"alt="Mutual Fund Screen" width="300"/>  <br>
+  <img src="https://github.com/user-attachments/assets/bbc90a84-ed4e-48c0-88e1-f627ea65efe5"alt="Mutual Fund Screen" width="300"/>  &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;
+  <img src="https://github.com/user-attachments/assets/56a942f6-0e66-4698-a346-50484c3fddb6"alt="Mutual Fund Screen" width="300"/>
+     </p>
 </div>
 
 <h2>👤 Account Screen</h2>
 <div class="screenshot-row">
-  <img src="https://github.com/user-attachments/assets/d711e68c-f490-432d-b90b-872130413d31">
-  <img src="https://github.com/user-attachments/assets/42bbc1b7-de27-4836-9653-9bb39972ce15">
+  <p align = "center">
+  <img src="https://github.com/user-attachments/assets/d711e68c-f490-432d-b90b-872130413d31"alt="Account Screen" width="300"/>  &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;
+  <img src="https://github.com/user-attachments/assets/42bbc1b7-de27-4836-9653-9bb39972ce15"alt="Account Screen" width="300"/>
+  </p>
 </div>
 
 </body>
