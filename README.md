@@ -77,27 +77,7 @@ InvestWise India is a powerful and beginner-friendly **FinTech mobile applicatio
 
 ---
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>InvestWise India – App Screenshots</title>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; background: #f8f8f8; }
-    h2 { color: #2c3e50; border-bottom: 2px solid #ccc; padding-bottom: 5px; }
-    .screenshot-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-      margin-bottom: 40px;
-    }
-    .screenshot-row img {
-      width: 240px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-  </style>
-</head>
+
 <body>
 
 <h1>📱 InvestWise India – App Screenshots</h1>
