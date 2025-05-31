@@ -76,29 +76,73 @@ InvestWise India is a powerful and beginner-friendly **FinTech mobile applicatio
 
 ---
 
-## 📸 Screenshots
-# LAUNCH Screen
-![11][Screenshot_20250521-183632_One UI Home](https://github.com/user-attachments/assets/363b4f88-92cb-43a5-9654-c9b962386f3a) &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; ![Screenshot_20250531-142740_InvestWise India](https://github.com/user-attachments/assets/8c394fd8-eee8-49f4-8c43-6f30196f646f) <br>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>InvestWise India – App Screenshots</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f8f8f8; }
+    h2 { color: #2c3e50; border-bottom: 2px solid #ccc; padding-bottom: 5px; }
+    .screenshot-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+    .screenshot-row img {
+      width: 240px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
 
-# Home Screen
-![Screenshot_20250521-184235_InvestWise India](https://github.com/user-attachments/assets/d3b59a5c-a53c-452c-9117-12b578036ea0) &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; ![Screenshot_20250521-184248_InvestWise India](https://github.com/user-attachments/assets/35474970-6993-4ca8-adac-bdc080dfc280) <br>
+<h1>📱 InvestWise India – App Screenshots</h1>
 
-![Screenshot_20250521-184306_InvestWise India](https://github.com/user-attachments/assets/b89736be-58bc-400a-8a6b-037fe1571061) &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; ![Screenshot_20250521-184322_InvestWise India](https://github.com/user-attachments/assets/24ad03e8-a10e-4039-be75-198b5d132e50) <br>
+<h2>🚀 Launch Screen</h2>
+<div class="screenshot-row">
+  <img src="https://github.com/user-attachments/assets/363b4f88-92cb-43a5-9654-c9b962386f3a">
+  <img src="https://github.com/user-attachments/assets/8c394fd8-eee8-49f4-8c43-6f30196f646f">
+</div>
 
-# FUND COMPARISION SCREEN
-![Screenshot_20250521-184329_InvestWise India](https://github.com/user-attachments/assets/d91c50b5-23d4-4a04-a6db-3c095ed814f4) &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; ![Screenshot_20250521-184333_InvestWise India](https://github.com/user-attachments/assets/d2f78092-8a50-499a-89ba-33b418b3b4af) &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; ![Screenshot_20250521-184348_InvestWise India](https://github.com/user-attachments/assets/df75380d-114a-4b4a-8c6e-855e73bc014c) <br>
+<h2>🏠 Home Screen</h2>
+<div class="screenshot-row">
+  <img src="https://github.com/user-attachments/assets/d3b59a5c-a53c-452c-9117-12b578036ea0">
+  <img src="https://github.com/user-attachments/assets/35474970-6993-4ca8-adac-bdc080dfc280">
+  <img src="https://github.com/user-attachments/assets/b89736be-58bc-400a-8a6b-037fe1571061">
+  <img src="https://github.com/user-attachments/assets/24ad03e8-a10e-4039-be75-198b5d132e50">
+</div>
 
-# ChatBot Screen
-![Screenshot_20250521-184353_InvestWise India](https://github.com/user-attachments/assets/6952037f-9999-40a1-b911-41f47581bdea)<br>
+<h2>📊 Fund Comparison Screen</h2>
+<div class="screenshot-row">
+  <img src="https://github.com/user-attachments/assets/d91c50b5-23d4-4a04-a6db-3c095ed814f4">
+  <img src="https://github.com/user-attachments/assets/d2f78092-8a50-499a-89ba-33b418b3b4af">
+  <img src="https://github.com/user-attachments/assets/df75380d-114a-4b4a-8c6e-855e73bc014c">
+</div>
 
-# MUTUAL FUND SCREEN
-![Screenshot_20250521-184404_InvestWise India](https://github.com/user-attachments/assets/e6202440-dad2-4d6b-ab47-a5b9e043355b) &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; ![Screenshot_20250521-184409_InvestWise India](https://github.com/user-attachments/assets/89287606-c67c-4e50-bb46-4afaf8806c7b) <br>
+<h2>🤖 ChatBot Screen</h2>
+<div class="screenshot-row">
+  <img src="https://github.com/user-attachments/assets/6952037f-9999-40a1-b911-41f47581bdea">
+</div>
 
-![Screenshot_20250521-184421_InvestWise India](https://github.com/user-attachments/assets/bbc90a84-ed4e-48c0-88e1-f627ea65efe5) &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; ![Screenshot_20250521-184431_InvestWise India](https://github.com/user-attachments/assets/56a942f6-0e66-4698-a346-50484c3fddb6) <br>
+<h2>📁 Mutual Fund Screen</h2>
+<div class="screenshot-row">
+  <img src="https://github.com/user-attachments/assets/e6202440-dad2-4d6b-ab47-a5b9e043355b">
+  <img src="https://github.com/user-attachments/assets/89287606-c67c-4e50-bb46-4afaf8806c7b">
+  <img src="https://github.com/user-attachments/assets/bbc90a84-ed4e-48c0-88e1-f627ea65efe5">
+  <img src="https://github.com/user-attachments/assets/56a942f6-0e66-4698-a346-50484c3fddb6">
+</div>
 
-# ACCOUNT SCREEN
-![Screenshot_20250521-184437_InvestWise India](https://github.com/user-attachments/assets/d711e68c-f490-432d-b90b-872130413d31) &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; ![Screenshot_20250521-184445_InvestWise India](https://github.com/user-attachments/assets/42bbc1b7-de27-4836-9653-9bb39972ce15) <br>
+<h2>👤 Account Screen</h2>
+<div class="screenshot-row">
+  <img src="https://github.com/user-attachments/assets/d711e68c-f490-432d-b90b-872130413d31">
+  <img src="https://github.com/user-attachments/assets/42bbc1b7-de27-4836-9653-9bb39972ce15">
+</div>
 
+</body>
+</html>
 
 ---
 
